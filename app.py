@@ -10,6 +10,8 @@ from resemblyzer import VoiceEncoder
 from sklearn.cluster import KMeans
 from sklearn.metrics import silhouette_score
 from datetime import timedelta
+import subprocess
+
 
 app = Flask(__name__)
 
@@ -29,6 +31,24 @@ else:
 print("Cargando modelo Whisper ('base') en", DEVICE, "...")
 whisper_model = whisper.load_model("base", device=DEVICE)
 print("✅ Modelo Whisper listo.")
+
+def extract_audio(input_file: str, output_file: str, sr: int = 16000):
+    """
+    Extrae la pista de audio de 'input_file' y la convierte a WAV mono,
+    sample rate 'sr'. Requiere ffmpeg instalado.
+    """
+    cmd = [
+        "ffmpeg",
+        "-i", input_file,
+        "-vn",                # sin video
+        "-acodec", "pcm_s16le",  # salida en raw PCM 16 bits
+        "-ar", str(sr),      # sample rate
+        "-ac", "1",          # mono
+        output_file,
+        "-y"                 # overwrite
+    ]
+    subprocess.run(cmd, check=True)
+
 
 ###############################################
 # MEMORIA DE TRABAJOS (job_id -> estado)
