@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Transcriptor de Audio</title>
+  <!-- Bootstrap 5 (Dark) -->
+  <link 
+    rel="stylesheet" 
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+  >
+  <!-- Estilos adicionales propios -->
+  <style>
+    body {
+      background-color: #121212;  /* Dark background */
+      color: #f5f5f5;            /* Light text */
+    }
+    .container {
+      max-width: 800px;
+    }
+    /* 
+      Evitamos scroll lateral: 
+      pre-wrap -> respeta saltos de línea y envuelve automáticamente
+      word-wrap/break-word -> corta palabras muy largas sin overflow 
+    */
+    #transcriptionTxt {
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+    }
+    /* 
+      Opcional: estilamos la barra de progreso 
+    */
+    .progress-bar {
+      transition: width 0.3s ease;
+    }
+  </style>
+</head>
+<body class="d-flex flex-column min-vh-100">
+  <main class="container flex-grow-1">
+    <h1 class="text-center mb-4">Transcriptor de Audio</h1>
+
+    <!-- Card para subir el archivo -->
+    <div class="card mb-4 bg-secondary text-light shadow">
+      <div class="card-body">
+        <form id="uploadForm">
+          <div class="mb-3">
+            <label for="audioFile" class="form-label">Selecciona archivo de audio</label>
+            <input 
+              type="file"
+              class="form-control"
+              id="audioFile"
+              accept=".wav,.mp3,.m4a"
+              required
+            />
+          </div>
+          <div class="mb-3">
+            <label for="nSpeakers" class="form-label">Número de hablantes (opcional)</label>
+            <input 
+              type="number"
+              class="form-control"
+              id="nSpeakers"
+              placeholder="Dejar en blanco para autodetectar"
+            />
+          </div>
+
+          <!-- Barra de progreso (porcentaje de subida) -->
+          <div class="mb-3">
+            <label class="form-label">Progreso de subida</label>
+            <div class="progress" style="height: 24px;">
+              <div 
+                id="uploadProgressBar" 
+                class="progress-bar bg-info" 
+                role="progressbar" 
+                aria-valuenow="0" 
+                aria-valuemin="0" 
+                aria-valuemax="100"
+                style="width: 0%;">
+                0%
+              </div>
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-primary w-100">
+            Transcribir
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Sección de estado/progreso de la transcripción en el servidor -->
+    <div id="processingSection" class="alert alert-warning d-none" role="alert">
+      <div class="spinner-border text-dark me-2" role="status">
+        <span class="visually-hidden">Procesando...</span>
+      </div>
+      <span>Procesando transcripción en el servidor. Por favor espera...</span>
+    </div>
+
+    <!-- Sección del resultado final -->
+    <div id="resultSection" class="mt-3 d-none">
+      <h3>Resultado de la transcripción:</h3>
+      <div class="border rounded bg-dark p-3" id="transcriptionTxt"></div>
+    </div>
+  </main>
+
+  <footer class="mt-auto py-3 bg-dark">
+    <div class="container text-center">
+      <span class="text-secondary">&copy; 2025 - Tu Proyecto</span>
+    </div>
+  </footer>
+
+  <!-- Bootstrap JS (para componentes que requieran JS) -->
+  <script 
+    src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js">
+  </script>
+
+  <script>
+    // Obtenemos referencias a elementos del DOM
+    const form = document.getElementById('uploadForm');
+    const fileInput = document.getElementById('audioFile');
+    const nSpeakersInput = document.getElementById('nSpeakers');
+    const uploadProgressBar = document.getElementById('uploadProgressBar');
+    const processingSection = document.getElementById('processingSection');
+    const resultSection = document.getElementById('resultSection');
+    const transcriptionTxt = document.getElementById('transcriptionTxt');
+
+    // Manejador del form "submit"
+    form.addEventListener('submit', function (event) {
+      event.preventDefault();
+
+      // Reseteamos UI
+      resultSection.classList.add('d-none');
+      processingSection.classList.add('d-none');
+      uploadProgressBar.style.width = '0%';
+      uploadProgressBar.textContent = '0%';
+      uploadProgressBar.setAttribute('aria-valuenow', 0);
+
+      // Construimos formData
+      const formData = new FormData();
+      formData.append('audio_file', fileInput.files[0]);
+      if (nSpeakersInput.value) {
+        formData.append('n_speakers', nSpeakersInput.value);
+      }
+
+      // Creamos un XHR para poder monitorizar el progreso de subida
+      const xhr = new XMLHttpRequest();
+
+      // Progreso de subida
+      xhr.upload.addEventListener('progress', function(e) {
+        if (e.lengthComputable) {
+          const percent = Math.round((e.loaded / e.total) * 100);
+          uploadProgressBar.style.width = percent + '%';
+          uploadProgressBar.textContent = percent + '%';
+          uploadProgressBar.setAttribute('aria-valuenow', percent);
+        }
+      });
+
+      // Cuando se termina la subida
+      xhr.addEventListener('load', function() {
+        // Mostramos mensaje de "procesando en el servidor"
+        processingSection.classList.remove('d-none');
+      });
+
+      // Cuando el servidor responde
+      xhr.onreadystatechange = function() {
+        if (xhr.readyState === XMLHttpRequest.DONE) {
+          processingSection.classList.add('d-none');
+          if (xhr.status === 200) {
+            // Éxito: mostramos resultado
+            const data = JSON.parse(xhr.responseText);
+            transcriptionTxt.textContent = data.transcription_txt || "No se recibió texto.";
+            resultSection.classList.remove('d-none');
+          } else {
+            // Error
+            const resp = JSON.parse(xhr.responseText);
+            transcriptionTxt.textContent = resp.error || "Ocurrió un error desconocido.";
+            resultSection.classList.remove('d-none');
+          }
+        }
+      };
+
+      // Enviar petición POST a /transcribe
+      xhr.open('POST', '/transcribe', true);
+      xhr.send(formData);
+    });
+  </script>
+
+</body>
+</html>

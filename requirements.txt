@@ -1,0 +1,8 @@
+Flask
+python-dotenv
+torch
+openai-whisper @ git+https://github.com/openai/whisper.git
+numpy
+librosa
+resemblyzer
+scikit-learn
