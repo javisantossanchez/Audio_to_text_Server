@@ -1,12 +1,31 @@
 # Transcripción y agrupación de interlocutores en audio
 
 ## Descripción
-Este programa transcribe un archivo de audio, agrupa las intervenciones por interlocutores y guarda la transcripción en un archivo de texto. Utiliza Whisper para la transcripción, Resemblyzer para generar embeddings y KMeans para la clusterización. Si no se especifica el número de interlocutores, se determina automáticamente usando el silhouette score.
+Este proyecto ofrece:
+
+- **Transcripción de audio** mediante OpenAI Whisper.
+- **Agrupación por interlocutores** usando embeddings de Resemblyzer y clustering con KMeans.
+- **Servicio web con Flask** que:
+  - Recibe un archivo de audio y procesa la transcripción en un hilo en segundo plano.
+  - Permite consultar el estado de progreso en tiempo real y obtener el resultado final vía endpoints de tipo polling.
+  - Incluye un front-end (modo oscuro, responsive) para subir el archivo, mostrar el porcentaje de procesamiento y ver la transcripción final.
+- Cuando no se especifica el número de interlocutores, se determina automáticamente usando el silhouette score.
+- Si `n_speakers == 1`, se omiten los embeddings y clustering para ahorrar tiempo de procesamiento.
 
 ## Requisitos
 - Python 3.7+
-- Bibliotecas: `argparse`, `whisper`, `librosa`, `numpy`, `resemblyzer`, `scikit-learn`, `datetime`
+- Para GPU (opcional): se requieren drivers de NVIDIA y `torch` con CUDA compatible.
+- Librerías principales:
+  - `torch` (con soporte CUDA si dispones de GPU)
+  - `openai-whisper` (puedes instalarlo desde su repositorio o con `pip install git+https://github.com/openai/whisper.git`)
+  - `librosa`
+  - `numpy`
+  - `resemblyzer`
+  - `scikit-learn`
+  - `flask`
+  - (Opcional) `python-dotenv` si usas `.env` para configuración
 
-## Instalación
+## Instalación básica
 ```bash
-pip install openai-whisper librosa numpy resemblyzer scikit-learn
+# Instala las librerías requeridas (sin versiones fijas):
+pip install flask torch openai-whisper librosa numpy resemblyzer scikit-learn
