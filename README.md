@@ -17,7 +17,7 @@ Este proyecto ofrece:
 - Para GPU (opcional): se requieren drivers de NVIDIA y `torch` con CUDA compatible.
 - Librerías principales:
   - `torch` (con soporte CUDA si dispones de GPU)
-  - `openai-whisper` (puedes instalarlo desde su repositorio o con `pip install git+https://github.com/openai/whisper.git`)
+  - `openai-whisper`
   - `librosa`
   - `numpy`
   - `resemblyzer`
