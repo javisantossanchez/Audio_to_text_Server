@@ -58,6 +58,21 @@
                   placeholder="Dejar vacío para autodetectar"
                 />
               </div>
+              <div class="mb-3">
+                <label for="language" class="form-label">Idioma del audio</label>
+                <select class="form-select" id="language">
+                  <option value="auto" selected>Auto-detectar</option>
+                  <option value="es">Español</option>
+                  <option value="en">Inglés</option>
+                  <option value="fr">Francés</option>
+                  <option value="de">Alemán</option>
+                  <option value="it">Italiano</option>
+                  <!-- Añade o quita lo que necesites -->
+                </select>
+                <div class="form-text">
+                  Si no estás seguro, deja “Auto-detectar”.
+                </div>
+              </div>
               <button class="btn btn-primary w-100" type="submit">
                 Iniciar Transcripción
               </button>
@@ -154,6 +169,9 @@
       if (nSpeakersVal) {
         formData.append('n_speakers', nSpeakersVal);
       }
+      const languageVal = document.getElementById('language').value || 'auto';
+      formData.append('language', languageVal);   // ← NUEVO
+
 
       try {
         // Llamar al back-end (POST /transcribe)

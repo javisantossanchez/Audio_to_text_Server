@@ -1,0 +1,129 @@
+/* ----------------------------------------
+   Tema oscuro para "Transcriptor casero"
+   Autor: ChatGPT – Junio 2025
+   ---------------------------------------- */
+
+/* ===== Variables de color ===== */
+:root {
+  --bg-body: #121212;
+  --bg-card: #1e1e1e;
+  --bg-card-secondary: #2a2a2a;
+  --text-main: #f5f5f5;
+  --text-muted: #c9c9c9;
+  --accent: #0d6efd;      /* azul Bootstrap primary */
+  --accent-light: #0d6efd33; /* 20 % opacidad */
+  --border-radius: 0.8rem;
+  --shadow: 0 6px 16px rgba(0, 0, 0, 0.5);
+}
+
+/* ===== Reset & tipografía ===== */
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--bg-body);
+  color: var(--text-main);
+  font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+h1, h5 {
+  letter-spacing: 0.5px;
+}
+
+/* ===== Tarjetas ===== */
+.card {
+  border: none;
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow);
+}
+
+.card.bg-secondary {
+  background-color: var(--bg-card-secondary) !important;
+}
+
+.card.bg-dark {
+  background-color: var(--bg-card) !important;
+}
+
+/* ===== Formularios ===== */
+.form-control,
+.form-select {
+  background-color: #181818;
+  color: var(--text-main);
+  border: 1px solid #333;
+  border-radius: var(--border-radius);
+}
+
+.form-control:focus,
+.form-select:focus {
+  background-color: #1b1b1b;
+  color: var(--text-main);
+  border-color: var(--accent);
+  box-shadow: 0 0 0 0.15rem var(--accent-light);
+}
+
+/* ===== Botones ===== */
+.btn-primary {
+  background-image: linear-gradient(135deg, var(--accent) 0%, #2e9eff 100%);
+  border: none;
+  font-weight: 600;
+  letter-spacing: 0.4px;
+  transition: transform 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(13, 110, 253, 0.4);
+}
+
+/* ===== Progress bar ===== */
+.progress {
+  background-color: #2b2b2b;
+  border-radius: var(--border-radius);
+  overflow: hidden;
+}
+
+.progress-bar {
+  background-image: linear-gradient(90deg, var(--accent) 0%, #2e9eff 100%);
+  font-weight: 600;
+}
+
+/* ===== Resultado ===== */
+#transcriptionTxt {
+  background-color: #181818;
+  color: var(--text-main);
+  border-radius: var(--border-radius);
+  max-height: 60vh;
+  overflow-y: auto;
+  scrollbar-width: thin;
+}
+
+#transcriptionTxt::-webkit-scrollbar {
+  width: 8px;
+}
+
+#transcriptionTxt::-webkit-scrollbar-track {
+  background: #202020;
+}
+
+#transcriptionTxt::-webkit-scrollbar-thumb {
+  background: #444;
+  border-radius: 4px;
+}
+
+/* ===== Pequeñas animaciones ===== */
+@keyframes pulse {
+  0%   { box-shadow: 0 0 0 0 var(--accent-light); }
+  70%  { box-shadow: 0 0 0 8px transparent; }
+  100% { box-shadow: 0 0 0 0 transparent; }
+}
+
+.btn-primary:active {
+  animation: pulse 0.6s;
+}
+
+/* ===== Utilidades ===== */
+.text-muted-custom {
+  color: var(--text-muted) !important;
+}
